@@ -1,3 +1,6 @@
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -6,9 +9,12 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class Publisher extends Thread {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Publisher.class);
+
     private final Path path;
     private final Subscriber subscriber;
     private final BlockingQueue<LogEvent> logQueue = new ArrayBlockingQueue<>(1);
+    private boolean isFinished = false;
 
     Publisher(String id, Path path, Subscriber subscriber) {
         super(id);
@@ -25,11 +31,12 @@ public class Publisher extends Thread {
                 logQueue.put(LogEvent.create(line));
             }
         } catch (IOException e) {
-            System.err.println("Problem reading from '" + path + "': " + e.getMessage());
+            LOGGER.error("Problem reading from '{}': {}", path, e.getMessage());
         } catch (InterruptedException e) {
-            System.err.println("Problem adding to queue from '" + path + "': " + e.getMessage());
+            LOGGER.error("Problem adding to queue from '{}': {}", path, e.getMessage());
         }
 
+        isFinished = true;
         subscriber.unsubscribe(this);
     }
 
@@ -40,5 +47,13 @@ public class Publisher extends Thread {
             subscriber.unsubscribe(this);
             return null;
         }
+    }
+
+    public int size() {
+        return logQueue.size();
+    }
+
+    public boolean isFinished() {
+        return isFinished;
     }
 }
