@@ -14,7 +14,6 @@ public class Publisher extends Thread {
     private final Path path;
     private final Subscriber subscriber;
     private final BlockingQueue<LogEvent> logQueue = new ArrayBlockingQueue<>(1);
-    private boolean isFinished = false;
 
     Publisher(String id, Path path, Subscriber subscriber) {
         super(id);
@@ -30,14 +29,13 @@ public class Publisher extends Thread {
             while ((line = reader.readLine()) != null) {
                 logQueue.put(LogEvent.create(line));
             }
+
+            logQueue.put(LogEvent.finished());
         } catch (IOException e) {
             LOGGER.error("Problem reading from '{}': {}", path, e.getMessage());
         } catch (InterruptedException e) {
             LOGGER.error("Problem adding to queue from '{}': {}", path, e.getMessage());
         }
-
-        isFinished = true;
-        subscriber.unsubscribe(this);
     }
 
     public LogEvent readEvent() {
@@ -51,9 +49,5 @@ public class Publisher extends Thread {
 
     public int size() {
         return logQueue.size();
-    }
-
-    public boolean isFinished() {
-        return isFinished;
     }
 }

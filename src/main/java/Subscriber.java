@@ -37,7 +37,7 @@ public class Subscriber {
 
             // If publisher is still subscribed, it still should have data so re-read from it
             final Publisher publisher = event.getPublisher();
-            if (!publisher.isFinished() && publishers.contains(publisher) && publisher.size() > 0) {
+            if (publishers.contains(publisher)) {
                 LOGGER.debug("Publisher '{}' has size {}", publisher.getName(), publisher.size());
                 storeFromPublisher(event.getPublisher());
             }
@@ -54,6 +54,11 @@ public class Subscriber {
 
     private void storeFromPublisher(final Publisher publisher) {
         final LogEvent logEvent = publisher.readEvent();
+        if (logEvent.isFinished()) {
+            publishers.remove(publisher);
+            return;
+        }
+
         final PublisherEvent publisherEvent = new PublisherEvent(publisher, logEvent.getEvent());
         events.put(logEvent.getEpochMilliSeconds(), publisherEvent);
     }
