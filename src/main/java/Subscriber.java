@@ -1,10 +1,7 @@
-import java.util.HashSet;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 public class Subscriber {
-    final Set<Publisher> publishers = new HashSet<>();
+    final Set<Publisher> publishers = Collections.synchronizedSet(new HashSet<>());
     final SortedMap<Long, PublisherEvent> events = new TreeMap<>();
 
     void subscribe(Publisher publisher) {

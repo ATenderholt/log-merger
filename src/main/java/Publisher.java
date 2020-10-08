@@ -2,13 +2,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.SynchronousQueue;
 
 public class Publisher extends Thread {
     private final Path path;
     private final Subscriber subscriber;
-    private final BlockingQueue<LogEvent> logQueue = new SynchronousQueue<>();
+    private final BlockingQueue<LogEvent> logQueue = new ArrayBlockingQueue<>(1);
 
     Publisher(String id, Path path, Subscriber subscriber) {
         super(id);
