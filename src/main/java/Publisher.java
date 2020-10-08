@@ -10,9 +10,10 @@ import java.util.concurrent.BlockingQueue;
 
 public class Publisher extends Thread {
     private static final Logger LOGGER = LoggerFactory.getLogger(Publisher.class);
+    private static final int QUEUE_SIZE = 1000;
 
     private final Path path;
-    private final BlockingQueue<LogEvent> logQueue = new ArrayBlockingQueue<>(1);
+    private final BlockingQueue<LogEvent> logQueue = new ArrayBlockingQueue<>(QUEUE_SIZE);
 
     Publisher(String id, Path path) {
         super(id);
