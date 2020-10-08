@@ -19,7 +19,8 @@ public class Main {
         final Subscriber subscriber = new Subscriber();
         for (String filename : args) {
             final Path path = Paths.get(filename);
-            final Publisher publisher = new Publisher(filename, path, subscriber);
+            final Publisher publisher = new Publisher(filename, path);
+            subscriber.add(publisher);
             publisher.start();
         }
 

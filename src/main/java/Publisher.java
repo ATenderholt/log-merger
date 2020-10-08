@@ -12,14 +12,11 @@ public class Publisher extends Thread {
     private static final Logger LOGGER = LoggerFactory.getLogger(Publisher.class);
 
     private final Path path;
-    private final Subscriber subscriber;
     private final BlockingQueue<LogEvent> logQueue = new ArrayBlockingQueue<>(1);
 
-    Publisher(String id, Path path, Subscriber subscriber) {
+    Publisher(String id, Path path) {
         super(id);
         this.path = path;
-        this.subscriber = subscriber;
-        subscriber.subscribe(this);
     }
 
     @Override
@@ -42,7 +39,11 @@ public class Publisher extends Thread {
         try {
             return logQueue.take();
         } catch (InterruptedException exception) {
-            subscriber.unsubscribe(this);
+            try {
+                logQueue.put(LogEvent.finished());
+            } catch (InterruptedException e) {
+                LOGGER.error("Problem adding to queue from '{}': {}", path, e.getMessage());
+            }
             return null;
         }
     }

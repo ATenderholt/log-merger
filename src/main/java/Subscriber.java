@@ -9,17 +9,8 @@ public class Subscriber {
     final Set<Publisher> publishers = Collections.synchronizedSet(new HashSet<>());
     final SortedMap<Long, PublisherEvent> events = new TreeMap<>();
 
-    void subscribe(Publisher publisher) {
+    void add(Publisher publisher) {
         publishers.add(publisher);
-    }
-
-    void unsubscribe(Publisher publisher) {
-        synchronized (publishers) {
-            while (publisher.size() > 0) {
-                storeFromPublisher(publisher);
-            }
-            publishers.remove(publisher);
-        }
     }
 
     void run() {
@@ -33,7 +24,6 @@ public class Subscriber {
             }
 
             System.out.println(event.getEvent());
-            LOGGER.debug("Events = {}, Active = {}", events.size(), publishers.size());
 
             // If publisher is still subscribed, it still should have data so re-read from it
             final Publisher publisher = event.getPublisher();
