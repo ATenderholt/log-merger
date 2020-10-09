@@ -6,7 +6,7 @@ import java.util.*;
 public class Subscriber {
     private final static Logger LOGGER = LoggerFactory.getLogger(Subscriber.class);
 
-    final Set<Publisher> publishers = Collections.synchronizedSet(new HashSet<>());
+    final Set<Publisher> publishers = new HashSet<>();
     final SortedMap<Long, PublisherEvent> events = new TreeMap<>();
 
     void add(Publisher publisher) {
@@ -35,10 +35,8 @@ public class Subscriber {
     }
 
     private void fill() {
-        synchronized (publishers) {
-            for (Publisher publisher : publishers) {
-                storeFromPublisher(publisher);
-            }
+        for (Publisher publisher : publishers) {
+            storeFromPublisher(publisher);
         }
     }
 
